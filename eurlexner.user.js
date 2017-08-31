@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Eurlex NER
 // @namespace    http://ladabehal.net/
-// @version      0.2
+// @version      0.3
 // @author       LB
 // @description  Annotates Eurlex Czech text with links to EU acts 
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
@@ -87,6 +87,7 @@
 		GM_xmlhttpRequest({
 			method: "POST",
 			url: "http://ner.aionindexing.eu/api/ner",
+			//url:"http://localhost/Indexing.NER.API/api/NER",
 			data: data,
 			headers: {
 				"User-Agent": "Mozilla/5.0",  
@@ -207,6 +208,9 @@ filter(?year = ${year})
 `;
 
 				sparqlQuery(s_query, function(bindings){
+					
+					if(bindings.length > 1) return;
+					
 					var celex = bindings[0].celex.value;
 					var celexMsg = celex+" zkopírován do schránky";
 					if(typeof celex === undefined) return;
@@ -215,7 +219,7 @@ filter(?year = ${year})
 					//create button with celexid and set it up for clipboard copy..					
 					var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}">${celex}</button>`);				
 					celexEls.insertAfter(el);
-					debugger;
+					
 					var noteEl = el.parent("p.note");	
 					if(noteEl !== null)
 					{
