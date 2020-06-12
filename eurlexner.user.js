@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Eurlex NER
 // @namespace    http://ladabehal.net/
-// @version      0.4
+// @version      0.5
 // @author       LB
 // @description  Annotates Eurlex Czech text with links to EU acts
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
@@ -126,18 +126,25 @@
 
     function addResumeTab(celexes)
     {
+		var oldPanel = $("#AionPanelCitated");
+		if(oldPanel)
+		{
+			oldPanel.remove();
+		}
+
+		console.log("adding tab")
         var celexesForm = "";
-        var buttonList = "<dl class='NMetadata'><dt>Citované dokumenty Aion: </dt><dd><ul>";
+        var buttonList = "<dl class='NMetadata'><dt>Citované dokumenty Aion: </dt><dd><ul id='celexList'>";
         celexes.forEach(celex =>
             {
                 celexesForm += " "+ celex
-                buttonList += `<li><a onclick="$('#${celex}').get(0).scrollIntoView();this.style.color='#ff0000'">scroll to ${celex}</a></li>`
+                buttonList += `<li><a onclick="$('#${celex}').get(0).scrollIntoView();this.style.color='#ff0000'" data-celex="${celex}">scroll to ${celex}</a></li>`
         });
         buttonList+="</ul></dd></dl>"
 
         //find text tab
-       var textPanel = $("div.panel-group>div.panel:contains(Text)");
-        var celexEls = $(`<div xmlns="http://www.w3.org/1999/xhtml" class="panel panel-default PagePanel">
+       var textPanel = $("div.panel-group>div.panel:has(div.panel-heading:contains(Text))")[0];
+        var celexEls = $(`<div id="AionPanelCitated" xmlns="http://www.w3.org/1999/xhtml" class="panel panel-default PagePanel">
    <div class="panel-heading" role="tab" id="PP_CitedDocs">
       <h2 class="panel-title">
          <a role="button" data-toggle="collapse" href="#PP_CitedDocs_Contents" aria-expanded="true" aria-controls="PP_CitedDocs_Contents" onclick="createDocPartCookie(this);" class="">Citované dokumenty Aion</a>
@@ -251,7 +258,10 @@ filter(?year = ${year})
 					console.log(celex);
 
                     if(celexes_.includes(celex) == false)
+					{
                         celexes_.push(celex);
+						addResumeTab(celexes_);
+					}
 
 					//create button with celexid and set it up for clipboard copy..
 					var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}"  id="${celex}">${celex}</button>`);
