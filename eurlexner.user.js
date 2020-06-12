@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Eurlex NER
 // @namespace    http://ladabehal.net/
-// @version      0.5
+// @version      0.6
 // @author       LB
 // @description  Annotates Eurlex Czech text with links to EU acts
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
@@ -33,6 +33,13 @@
 	var ojUriMatch = new RegExp("uri=OJ\\:(.*?)\\:(.*?)\\:(.*?)\\:TOC");//uri=OJ:L:2006:302:TOC
 	var noteLinks = [];
 	var clipboard = new Clipboard('.btn');
+
+	String.prototype.escapeSelector = function () {
+    return this.replace(
+        /([$%&()*+,./:;<=>?@\[\\\]^\{|}~])/g,
+        '\\\\$1'
+    );
+};
 
 	function escapeRegExp(str) {
 		return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -138,7 +145,7 @@
         celexes.forEach(celex =>
             {
                 celexesForm += " "+ celex
-                buttonList += `<li><a onclick="$('#${celex}').get(0).scrollIntoView();this.style.color='#ff0000'" data-celex="${celex}">scroll to ${celex}</a></li>`
+                buttonList += `<li><a onclick="$('#${(celex).escapeSelector()}').get(0).scrollIntoView();this.style.color='#ff0000'" data-celex="${celex}">scroll to ${celex}</a></li>`
         });
         buttonList+="</ul></dd></dl>"
 
@@ -208,7 +215,7 @@
 			if(celex === undefined) return;
 			//data-id_celex
 			//create button with celexid and set it up for clipboard copy..
-			var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}" id="${celex}">${celex}</button>`);
+			var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}" id="${(celex)}">${celex}</button>`);
 			celexEls.insertAfter(el);
 
             if(celexes_.includes(celex) == false)
@@ -264,7 +271,7 @@ filter(?year = ${year})
 					}
 
 					//create button with celexid and set it up for clipboard copy..
-					var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}"  id="${celex}">${celex}</button>`);
+					var celexEls = $(`<button class="btn" style="margin-left:5px" data-clipboard-text="${celex}"  id="${(celex)}">${celex}</button>`);
 					celexEls.insertAfter(el);
 
 					var noteEl = el.parent("p.note");
